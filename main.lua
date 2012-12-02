@@ -70,7 +70,8 @@ do
     db_client:sadd("irc:users:nicks", nick)
 
     if type(commands[cmd]) == "function" then
-      pcall(commands[cmd],chan, nick, args)
+      local success, message = pcall(commands[cmd],chan, nick, args)
+      if not success then print(message) end
     end
   end
 
