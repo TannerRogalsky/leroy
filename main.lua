@@ -8,13 +8,13 @@ do
 
   local IRC = require "irc"
   local redis = require 'redis'
+  local cron = require 'cron'
   local db_client = redis.connect('127.0.0.1', 6379)
   assert(db_client:ping(), "Check redis host and port")
 
   local connection = IRC.connect("irc.mountai.net")
   connection:nick("feh")
   connection:user('bot', '0', '*', 'baddest man in the whole damn town')
-  connection:join("#keyboards")
 
   local replies, commands = {}, {}
   function commands.help(chan, nick, args)
@@ -25,7 +25,7 @@ do
   end
   function commands.kb(chan, nick, args)
     local subcommand = table.remove(args, 1)
-    local response
+    local response = nil
     if subcommand == "register" then
       db_client:rpush("irc:keyboards:"..nick, table.concat(args, " "))
       response = "success"
@@ -33,8 +33,18 @@ do
       response = table.concat(db_client:lrange("irc:keyboards:"..args[1], 0, -1), ", ")
     elseif subcommand == "del" then
       db_client:del("irc:keyboards:"..nick)
+    elseif subcommand == "listall"
+      local nicks = db_client:smembers("irc:users:nicks")
+      for _,n in ipairs(nicks) do
+        local keyboards = db_client:lrange("irc:keyboards:"..n, 0, -1)
+        local kb_text = table.concat(keyboards, ", ")
+        privmsg(nick, kb_text)
+      end
     end
-    connection:privmsg(chan, response)
+
+    if response then
+      connection:privmsg(chan, response)
+    end
   end
 
 
@@ -57,13 +67,25 @@ do
       chan = nick
     end
 
+    db_client:sadd("irc:users:nicks", nick)
+
     if type(commands[cmd]) == "function" then
       pcall(commands[cmd],chan, nick, args)
     end
   end
 
+  cron.after(1, function()
+    connection:join("#keyboards")
+  end)
 
+  local socket = require('socket')
+  local last_time = socket.gettime()
   while true do
+    local time = socket.gettime()
+    local dt = time - last_time
+    last_time = time
+    cron.update(dt)
+
     connection:send_dequeue()
     line, err = connection.socket:receive('*l')
     if line then
