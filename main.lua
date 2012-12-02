@@ -74,7 +74,7 @@ do
     end
   end
 
-  cron.after(1, function()
+  cron.after(3, function()
     connection:join("#keyboards")
   end)
 
