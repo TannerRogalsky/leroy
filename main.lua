@@ -33,7 +33,7 @@ do
       response = table.concat(db_client:lrange("irc:keyboards:"..args[1], 0, -1), ", ")
     elseif subcommand == "del" then
       db_client:del("irc:keyboards:"..nick)
-    elseif subcommand == "listall"
+    elseif subcommand == "listall" then
       local nicks = db_client:smembers("irc:users:nicks")
       for _,n in ipairs(nicks) do
         local keyboards = db_client:lrange("irc:keyboards:"..n, 0, -1)
