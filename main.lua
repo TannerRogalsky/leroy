@@ -40,6 +40,7 @@ do
 
   replies.PING = function(prefix, rest)
     connection:pong(rest)
+    db_client:ping()
   end
   function replies.PRIVMSG(prefix, rest)
     local chan = rest:match('(%S+)')
