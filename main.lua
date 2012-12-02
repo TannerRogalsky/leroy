@@ -38,7 +38,7 @@ do
       for _,n in ipairs(nicks) do
         local keyboards = db_client:lrange("irc:keyboards:"..n, 0, -1)
         local kb_text = table.concat(keyboards, ", ")
-        privmsg(nick, kb_text)
+        connection:privmsg(nick, kb_text)
       end
     end
 
