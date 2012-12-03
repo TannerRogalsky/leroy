@@ -37,8 +37,10 @@ do
       local nicks = db_client:smembers("irc:users:nicks")
       for _,n in ipairs(nicks) do
         local keyboards = db_client:lrange("irc:keyboards:"..n, 0, -1)
-        local kb_text = table.concat(keyboards, ", ")
-        connection:privmsg(nick, kb_text)
+        if keyboards then
+          local kb_text = table.concat(keyboards, ", ")
+          connection:privmsg(nick, n.. ": " ..kb_text)
+        end
       end
     end
 
