@@ -6,9 +6,13 @@ do
     return fields
   end
 
-  local IRC = require "irc"
+  local IRC = require 'irc'
   local redis = require 'redis'
   local cron = require 'cron'
+  local json = require 'json'
+  local http = require 'socket.http'
+  local socket = require 'socket'
+
   local db_client = redis.connect('127.0.0.1', 6379)
   assert(db_client:ping(), "Check redis host and port")
 
@@ -53,6 +57,15 @@ do
   replies.PING = function(prefix, rest)
     connection:pong(rest)
     db_client:ping()
+    local response = json.decode(http.get("http://www.reddit.com/r/MechanicalKeyboards/new/.json?limit=10"))
+    local posts = response.data.children
+    for i,post_container in ipairs(posts) do
+      local post = post_container.data
+      -- post.id
+      -- post.title
+      -- post.permalink
+      -- post.author
+    end
   end
   function replies.PRIVMSG(prefix, rest)
     local chan = rest:match('(%S+)')
@@ -81,7 +94,6 @@ do
     connection:join("#keyboards")
   end)
 
-  local socket = require('socket')
   local last_time = socket.gettime()
   while true do
     local time = socket.gettime()
