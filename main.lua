@@ -54,7 +54,7 @@ do
   end
 
 
-  function replies.PING(prefix, rest)
+  function replies.ping(prefix, rest)
     connection:pong(rest)
     db_client:ping()
 
@@ -72,7 +72,7 @@ do
       end
     end
   end
-  function replies.PRIVMSG(prefix, rest)
+  function replies.privmsg(prefix, rest)
     local chan = rest:match('(%S+)')
     local msg = rest:match(':(.*)')
     local nick = prefix:match('(%S+)!')
@@ -111,6 +111,7 @@ do
     if line then
       print(line)
       prefix, command, rest = IRC.tokenize_line(line)
+      command = command:lower()
       if replies[command] then replies[command](prefix, rest) end
     elseif err == 'closed' then
       break
