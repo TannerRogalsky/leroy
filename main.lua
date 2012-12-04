@@ -54,17 +54,22 @@ do
   end
 
 
-  replies.PING = function(prefix, rest)
+  function replies.PING(prefix, rest)
     connection:pong(rest)
     db_client:ping()
-    local response = json.decode(http.get("http://www.reddit.com/r/MechanicalKeyboards/new/.json?limit=10"))
+
+    local response = http.request("http://www.reddit.com/r/MechanicalKeyboards/new/.json?limit=10")
+    response = json.decode(response)
     local posts = response.data.children
     for i,post_container in ipairs(posts) do
       local post = post_container.data
-      -- post.id
-      -- post.title
-      -- post.permalink
-      -- post.author
+      local new = db_client:hsetnx("irc:reddit:new_posts", post.id, post.created)
+
+      if new then
+        local text = "New post: '" .. post.title:match "^%s*(.-)%s*$" .. "' by " .. post.author
+        text = text .. " @ http://www.reddit.com" .. post.permalink
+        connection:privmsg("#keyboards", text)
+      end
     end
   end
   function replies.PRIVMSG(prefix, rest)
