@@ -58,7 +58,8 @@ do
     connection:pong(rest)
     db_client:ping()
 
-    local response = http.request("http://www.reddit.com/r/MechanicalKeyboards/new/.json?limit=10")
+    local base_url = "http://www.reddit.com"
+    local response, status_code, headers, status = http.request(base_url .. "/r/MechanicalKeyboards/new/.json?limit=10")
     response = json.decode(response)
     local posts = response.data.children
     for i,post_container in ipairs(posts) do
@@ -67,7 +68,7 @@ do
 
       if new then
         local text = "New post: '" .. post.title:match "^%s*(.-)%s*$" .. "' by " .. post.author
-        text = text .. " @ http://www.reddit.com" .. post.permalink
+        text = text .. " @ " .. base_url .. post.permalink
         connection:privmsg("#keyboards", text)
       end
     end
