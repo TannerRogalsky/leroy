@@ -28,7 +28,12 @@ do
     irc_client:join(unpack(args))
   end
   function commands.subscribe(chan, nick, args)
-
+    db_client:sadd("irc:reddit:subscribed_users", nick)
+    irc_client:privmsg(chan, "Subscribed!")
+  end
+  function commands.unsubscribe(chan, nick, args)
+    db_client:srem("irc:reddit:subscribed_users", nick)
+    irc_client:privmsg(chan, "Unsubscribed!")
   end
   function commands.kb(chan, nick, args)
     local subcommand = table.remove(args, 1)
@@ -74,6 +79,9 @@ do
       if new then
         local text = "New post: '" .. post.title:match "^%s*(.-)%s*$" .. "' by " .. post.author
         text = text .. " @ " .. base_url .. post.permalink
+        for _,nick in ipairs(db_client:smembers("irc:reddit:subscribed_users")) do
+          irc_client:privmsg(nick, text)
+        end
         irc_client:privmsg("#keyboards", text)
       end
     end
