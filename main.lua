@@ -16,46 +16,51 @@ do
   local db_client = redis.connect('127.0.0.1', 6379)
   assert(db_client:ping(), "Check redis host and port")
 
-  local connection = IRC.connect("irc.mountai.net")
-  connection:nick("feh")
-  connection:user('bot', '0', '*', 'baddest man in the whole damn town')
+  local irc_client = IRC.connect("irc.mountai.net")
+  irc_client:nick("feh")
+  irc_client:user('bot', '0', '*', 'baddest man in the whole damn town')
 
   local replies, commands = {}, {}
   function commands.help(chan, nick, args)
-    connection:privmsg(chan, "!kb register <keyboard>, !kb del, !kb list <user>")
+    irc_client:privmsg(chan, "!kb register <keyboard>, !kb del, !kb list <user>")
   end
   function commands.join(chan, nick, args)
-    connection:join(unpack(args))
+    irc_client:join(unpack(args))
+  end
+  function commands.subscribe(chan, nick, args)
+
   end
   function commands.kb(chan, nick, args)
     local subcommand = table.remove(args, 1)
     local response = nil
-    if subcommand == "register" then
-      db_client:rpush("irc:keyboards:"..nick, table.concat(args, " "))
-      response = "success"
+    if subcommand == "register" and #args > 0 then
+      local keyboard = table.concat(args, " ")
+      db_client:rpush("irc:keyboards:"..nick, keyboard)
+      response = "Registered: " .. keyboard
     elseif subcommand == "list" then
       response = table.concat(db_client:lrange("irc:keyboards:"..args[1], 0, -1), ", ")
     elseif subcommand == "del" then
       db_client:del("irc:keyboards:"..nick)
+      response = "Removed all keyboards registered to " .. nick
     elseif subcommand == "listall" then
       local nicks = db_client:smembers("irc:users:nicks")
       for _,n in ipairs(nicks) do
         local keyboards = db_client:lrange("irc:keyboards:"..n, 0, -1)
         if keyboards then
           local kb_text = table.concat(keyboards, ", ")
-          connection:privmsg(nick, n.. ": " ..kb_text)
+          irc_client:privmsg(nick, n.. ": " ..kb_text)
         end
       end
     end
 
     if response then
-      connection:privmsg(chan, response)
+      irc_client:privmsg(chan, response)
     end
   end
 
 
   function replies.ping(prefix, rest)
-    connection:pong(rest)
+    irc_client:pong(rest)
     db_client:ping()
 
     local base_url = "http://www.reddit.com"
@@ -69,7 +74,7 @@ do
       if new then
         local text = "New post: '" .. post.title:match "^%s*(.-)%s*$" .. "' by " .. post.author
         text = text .. " @ " .. base_url .. post.permalink
-        connection:privmsg("#keyboards", text)
+        irc_client:privmsg("#keyboards", text)
       end
     end
   end
