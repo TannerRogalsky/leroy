@@ -25,7 +25,7 @@ do
 
   local replies, commands = {}, {}
   function commands.help(chan, nick, args)
-    irc_client:privmsg(chan, "!kb register <keyboard>, !kb del, !kb list <user>")
+    irc_client:privmsg(chan, "!kb register <keyboard>, !kb del, !kb list <user>, !kb listall, !subscribe")
   end
   function commands.subscribe(chan, nick, args)
     db_client:sadd("irc:reddit:subscribed_users", nick)
