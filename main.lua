@@ -111,7 +111,7 @@ do
   end
 
   cron.after(3, function()
-    connection:join("#keyboards")
+    irc_client:join("#keyboards")
   end)
 
   local last_time = socket.gettime()
@@ -121,8 +121,8 @@ do
     last_time = time
     cron.update(dt)
 
-    connection:send_dequeue()
-    line, err = connection.socket:receive('*l')
+    irc_client:send_dequeue()
+    local line, err = irc_client.socket:receive('*l')
     if line then
       print(line)
       prefix, command, rest = IRC.tokenize_line(line)
