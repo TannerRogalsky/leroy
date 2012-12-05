@@ -70,6 +70,7 @@ do
 
     local base_url = "http://www.reddit.com"
     local response, status_code, headers, status = http.request(base_url .. "/r/MechanicalKeyboards/new/.json?limit=10")
+    print("status_code: " .. status_code)
     response = json.decode(response)
     local posts = response.data.children
     for i,post_container in ipairs(posts) do
