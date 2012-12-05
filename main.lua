@@ -70,20 +70,21 @@ do
 
     local base_url = "http://www.reddit.com"
     local response, status_code, headers, status = http.request(base_url .. "/r/MechanicalKeyboards/new/.json?limit=10")
-    print("status_code: " .. status_code)
-    response = json.decode(response)
-    local posts = response.data.children
-    for i,post_container in ipairs(posts) do
-      local post = post_container.data
-      local new = db_client:hsetnx("irc:reddit:new_posts", post.id, post.created)
+    if status_code == 200 then
+      response = json.decode(response)
+      local posts = response.data.children
+      for i,post_container in ipairs(posts) do
+        local post = post_container.data
+        local new = db_client:hsetnx("irc:reddit:new_posts", post.id, post.created)
 
-      if new then
-        local text = "New post: '" .. post.title:match "^%s*(.-)%s*$" .. "' by " .. post.author
-        text = text .. " @ " .. base_url .. post.permalink
-        for _,nick in ipairs(db_client:smembers("irc:reddit:subscribed_users")) do
-          irc_client:privmsg(nick, text)
+        if new then
+          local text = "New post: '" .. post.title:match "^%s*(.-)%s*$" .. "' by " .. post.author
+          text = text .. " @ " .. base_url .. post.permalink
+          for _,nick in ipairs(db_client:smembers("irc:reddit:subscribed_users")) do
+            irc_client:privmsg(nick, text)
+          end
+          irc_client:privmsg(config.channel, text)
         end
-        irc_client:privmsg(config.channel, text)
       end
     end
   end
