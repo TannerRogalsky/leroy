@@ -16,16 +16,16 @@ do
   local db_client = redis.connect('127.0.0.1', 6379)
   assert(db_client:ping(), "Check redis host and port")
 
+  local environment = arg[1] or "test"
+  local config = require("config." .. environment .. "_config")
+
   local irc_client = IRC.connect("irc.mountai.net")
-  irc_client:nick("feh")
+  irc_client:nick(config.nick)
   irc_client:user('bot', '0', '*', 'baddest man in the whole damn town')
 
   local replies, commands = {}, {}
   function commands.help(chan, nick, args)
     irc_client:privmsg(chan, "!kb register <keyboard>, !kb del, !kb list <user>")
-  end
-  function commands.join(chan, nick, args)
-    irc_client:join(unpack(args))
   end
   function commands.subscribe(chan, nick, args)
     db_client:sadd("irc:reddit:subscribed_users", nick)
@@ -51,7 +51,7 @@ do
       local nicks = db_client:smembers("irc:users:nicks")
       for _,n in ipairs(nicks) do
         local keyboards = db_client:lrange("irc:keyboards:"..n, 0, -1)
-        if keyboards then
+        if keyboards and #keyboards > 0 then
           local kb_text = table.concat(keyboards, ", ")
           irc_client:privmsg(nick, n.. ": " ..kb_text)
         end
@@ -83,7 +83,7 @@ do
         for _,nick in ipairs(db_client:smembers("irc:reddit:subscribed_users")) do
           irc_client:privmsg(nick, text)
         end
-        irc_client:privmsg("#keyboards", text)
+        irc_client:privmsg(config.channel, text)
       end
     end
   end
@@ -111,7 +111,7 @@ do
   end
 
   cron.after(3, function()
-    irc_client:join("#keyboards")
+    irc_client:join(config.channel)
   end)
 
   local last_time = socket.gettime()
