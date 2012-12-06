@@ -79,7 +79,7 @@ do
 
         if new then
           local text = "New post: '" .. post.title:match "^%s*(.-)%s*$" .. "' by " .. post.author
-          text = text .. " @ " .. base_url .. post.permalink
+          text = text .. " @ http://redd.it/" .. post.id
           for _,nick in ipairs(db_client:smembers("irc:reddit:subscribed_users")) do
             irc_client:privmsg(nick, text)
           end
