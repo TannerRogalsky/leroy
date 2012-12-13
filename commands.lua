@@ -1,15 +1,19 @@
 local commands = {}
+
 function commands.help(chan, nick, args)
   irc_client:privmsg(chan, "!kb register <keyboard>, !kb del, !kb list <user>, !kb listall, !subscribe")
 end
+
 function commands.subscribe(chan, nick, args)
   db_client:sadd("irc:reddit:subscribed_users", nick)
   irc_client:privmsg(chan, "Subscribed!")
 end
+
 function commands.unsubscribe(chan, nick, args)
   db_client:srem("irc:reddit:subscribed_users", nick)
   irc_client:privmsg(chan, "Unsubscribed!")
 end
+
 function commands.kb(chan, nick, args)
   local subcommand = table.remove(args, 1)
   local response = nil
