@@ -24,6 +24,7 @@ function replies.ping(prefix, rest)
     end
   end
 end
+
 function replies.privmsg(prefix, rest)
   local chan = rest:match('(%S+)')
   local msg = rest:match(':(.*)')
@@ -45,6 +46,11 @@ function replies.privmsg(prefix, rest)
     local success, message = pcall(commands[cmd],chan, nick, args)
     if not success then print(message) end
   end
+end
+
+-- rpl_endofmotd
+replies["376"] = function(prefix, rest)
+  irc_client:join("#keybaords")
 end
 
 return replies

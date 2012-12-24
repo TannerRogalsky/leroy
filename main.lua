@@ -26,10 +26,6 @@ do
   local commands = require 'commands'
   local replies = require 'replies'
 
-  cron.after(3, function()
-    irc_client:join(config.channel)
-  end)
-
   local last_time = socket.gettime()
   while true do
     local time = socket.gettime()
