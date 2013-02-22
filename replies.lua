@@ -19,7 +19,7 @@ function replies.ping(prefix, rest)
         for _,nick in ipairs(db_client:smembers("irc:reddit:subscribed_users")) do
           irc_client:privmsg(nick, text)
         end
-        irc_client:privmsg("#keyboards", text)
+        irc_client:privmsg("#Mechboards", text)
       end
     end
   end
@@ -50,7 +50,7 @@ end
 
 -- rpl_endofmotd
 replies["376"] = function(prefix, rest)
-  irc_client:join("#keyboards")
+  irc_client:join("#Mechboards")
 end
 
 return replies
