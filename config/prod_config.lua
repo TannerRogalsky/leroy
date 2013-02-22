@@ -1,4 +1,4 @@
 return {
-  nick = "feh",
-  channel = "#keyboards"
+  nick = "notripster",
+  channel = "#Mechboards"
 }

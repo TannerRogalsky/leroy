@@ -1,4 +1,4 @@
 return {
-  nick = "testbot",
-  channel = "#test"
+  nick = "notripstertest",
+  channel = "#Mechboardstest"
 }
