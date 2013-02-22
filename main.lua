@@ -19,7 +19,7 @@ do
   local environment = arg[1] or 'test'
   config = require('config.' .. environment .. '_config')
 
-  irc_client = IRC.connect('irc.mountai.net')
+  irc_client = IRC.connect('irc.freenode.net')
   irc_client:nick(config.nick)
   irc_client:user('bot', '0', '*', 'baddest man in the whole damn town')
 
