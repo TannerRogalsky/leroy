@@ -23,12 +23,8 @@ do
   irc_client:nick(config.nick)
   irc_client:user('bot', '0', '*', 'baddest man in the whole damn town')
 
-  local commands = require 'commands'
-  local replies = require 'replies'
-
-  cron.after(3, function()
-    irc_client:join(config.channel)
-  end)
+  commands = require 'commands'
+  replies = require 'replies'
 
   local last_time = socket.gettime()
   while true do
