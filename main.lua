@@ -8,7 +8,6 @@ do
 
   local IRC = require 'irc'
   local redis = require 'redis'
-  local cron = require 'cron'
 
   http = require 'socket.http'
   local socket = require 'socket'
@@ -26,13 +25,7 @@ do
   commands = require 'commands'
   replies = require 'replies'
 
-  local last_time = socket.gettime()
   while true do
-    local time = socket.gettime()
-    local dt = time - last_time
-    last_time = time
-    cron.update(dt)
-
     irc_client:send_dequeue()
     local line, err = irc_client.socket:receive('*l')
     if line then
