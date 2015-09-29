@@ -1,0 +1,4 @@
+main.lua: entry point for existing bot
+irc.lua: implements the irc protocol
+commands.lua: reacts to irc commands from messages
+replies.lua: reacts to non-public and protocol messages
